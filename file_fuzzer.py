@@ -39,7 +39,7 @@ class file_fuzzer:
         self.recipients = ['http://dnsdudrla97.github.io/', ]
         self.sender = 'http://dnsdudrla97.github.io/'
 
-        self.test_cases = [ "%s%n%s%n%s%n", "\xff", "\x00", "A" ]
+        self.test_cases = [ "%s%n%s%n%s%n", "\xff", "\x00", "A", "\x90", "%p", "%n", "%hn", "%hhn"]
 
     def file_picker( self ):
 
@@ -107,7 +107,7 @@ class file_fuzzer:
 
             while self.running:
                 time.sleep(1)
-                
+
     # 에러를 추적하고 해당 정보를 저장하기 위한 접근 위반 핸들러
     def check_accessv(self,dbg):
 

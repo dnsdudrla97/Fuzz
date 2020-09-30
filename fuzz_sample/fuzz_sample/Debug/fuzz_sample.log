@@ -1,0 +1,3 @@
+﻿cl : 명령줄 warning D9025: '/sdl-'을(를) '/GS-'(으)로 재정의합니다.
+  t_s.c
+D:\Fuzz\fuzz_sample\fuzz_sample\t_s.c(10,2): warning C4996: 'read': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _read. See online help for details.

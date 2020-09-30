@@ -1,0 +1,9 @@
+﻿  t_s.c
+D:\Fuzz\fuzz_sample\fuzz_sample\t_s.c(4,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': 매크로 재정의
+D:\Fuzz\fuzz_sample\fuzz_sample\t_s.c : message : '_CRT_SECURE_NO_WARNINGS'의 이전 정의를 참조하십시오.
+  코드를 생성하고 있습니다.
+  1 of 1 functions (100.0%) were compiled.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  코드를 생성했습니다.
+  fuzz_sample.vcxproj -> D:\Fuzz\fuzz_sample\Release\fuzz_sample.exe

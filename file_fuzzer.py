@@ -1,3 +1,4 @@
+# -*-coding:utf-8-*-
 from pydbg import *
 from pydbg.defines import *
 
@@ -33,10 +34,10 @@ class file_fuzzer:
         self.running        = False
         self.ready          = False
         
-        # Optional
-        self.smtpserver = 'mail.nostarch.com'        
-        self.recipients = ['jms@bughunter.ca',]
-        self.sender     = 'jms@bughunter.ca'
+        # options
+        self.smtpserver = 'http://dnsdudrla97.github.io/'
+        self.recipients = ['http://dnsdudrla97.github.io/', ]
+        self.sender = 'http://dnsdudrla97.github.io/'
 
         self.test_cases = [ "%s%n%s%n%s%n", "\xff", "\x00", "A" ]
 
@@ -56,11 +57,11 @@ class file_fuzzer:
 
             if not self.running:
 
-                # We first snag a file for mutation
+                # 먼저 변형을 가할 파일을 선택
                 self.test_file = self.file_picker()
                 self.mutate_file()
 
-                # Start up the debugger thread
+                # 디버거 스레드를 실행
                 pydbg_thread = threading.Thread(target=self.start_debugger)
                 pydbg_thread.setDaemon(0)
                 pydbg_thread.start()
@@ -68,13 +69,13 @@ class file_fuzzer:
                 while self.pid == None:
                     time.sleep(1)
 
-                # Start up the monitoring thread
+                # 모니터링 스레드를 실행시킨다.
                 monitor_thread = threading.Thread(target=self.monitor_debugger)
                 monitor_thread.setDaemon(0)
                 monitor_thread.start()
 
                 self.iteration += 1
-
+    # 대상 애플리케이션을 실행시키는 디버거 스레드
     def start_debugger(self):
 
         print ("[*] Starting debugger for iteration: %d" % self.iteration)
@@ -86,7 +87,7 @@ class file_fuzzer:
 
         self.pid = self.dbg.pid
         self.dbg.run()         
-
+    # 애플리케이션 몇 초 동안 실행시킨담에 종료시키는 모니터링 스레드
     def monitor_debugger(self):
 
         counter = 0
@@ -106,7 +107,8 @@ class file_fuzzer:
 
             while self.running:
                 time.sleep(1)
-
+                
+    # 에러를 추적하고 해당 정보를 저장하기 위한 접근 위반 핸들러
     def check_accessv(self,dbg):
 
         if dbg.dbg.u.Exception.dwFirstChance:
@@ -119,11 +121,11 @@ class file_fuzzer:
         crash_bin.record_crash(dbg)
         self.crash = crash_bin.crash_synopsis()
 
-        # Write out the crash informations
+        # 에러 정보 작성
         crash_fd = open("crashes\\crash-%d" % self.iteration,"w")
         crash_fd.write(self.crash)
 
-        # Now backup the files
+        # 파일 백업
         shutil.copy("test.%s" % self.ext,"crashes\\%d.%s" % (self.iteration,self.ext))
         shutil.copy("examples\\%s" % self.test_file,"crashes\\%d_orig.%s" % (self.iteration,self.ext))
 
@@ -135,7 +137,7 @@ class file_fuzzer:
             notify()
             
         return DBG_EXCEPTION_NOT_HANDLED  
-
+    # 에러 정보 이메일 통보
     def notify(self):
 
         crash_message = "From:%s\r\n\r\nTo:\r\n\r\nIteration: %d\n\nOutput:\n\n %s" % (self.sender, self.iteration, self.crash)
@@ -145,33 +147,32 @@ class file_fuzzer:
         session.quit()   
 
         return
-
+    # mutate file
     def mutate_file( self ):
 
-        # Pull the contents of the file into a buffer
+        # 파일의 내용을 버퍼로 읽어들이기
         fd = open("test.%s" % self.ext, "rb")
         stream = fd.read()
         fd.close()
 
-        # The fuzzing meat and potatoes, really simple
-        # take a random test case and apply it to a random position
-        # in the file
+
+        # 퍼징의 가장 핵심적인 부분
+        # 임의의 test_case를 선택해 파일 내부의 임의의 위치에 적용한다.
         test_case = self.test_cases[random.randint(0,len(self.test_cases)-1)]
 
         stream_length = len(stream)
         rand_offset   = random.randint(0,  stream_length - 1 )
         rand_len      = random.randint(1, 1000)
 
-        # Now take the test case and repeat it
+        # 선택한 test_case를 반복 시킨다.
         test_case = test_case * rand_len
 
-        # Apply it to the buffer, we are just
-        # splicing in our fuzz data
+        # 파일 데이터 버퍼에 그것을 삽입한다.
         fuzz_file = stream[0:rand_offset]
         fuzz_file += str(test_case)
         fuzz_file += stream[rand_offset:]
 
-        # Write out the file
+        # 버퍼의 내용을 파일에 써 넣는다.
         fd = open("test.%s" % self.ext, "wb")
         fd.write( fuzz_file )
         fd.close()
@@ -190,8 +191,7 @@ if __name__ == "__main__":
 
     print "[*] Generic File Fuzzer."
 
-    # This is the path to the document parser
-    # and the filename extension to use
+    # 문서 파싱을 수행할 애플리케이션의 경로와 사용될 파일 확장자
     try:
         opts, argo = getopt.getopt(sys.argv[1:],"e:x:n")
     except getopt.GetoptError:

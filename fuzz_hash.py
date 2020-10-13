@@ -107,7 +107,7 @@ class file_fuzzer:
 			return
 
 		# The mutate counter is based on the Full length 
-		streamLength = len(self.stream)					                            # Get the Full length of the target file
+		streamLength = len(self.stream)					                                # Get the Full length of the target file
 		mutateCount = int(streamLength*0.01)
 		mutateCount2 = int(streamLength*0.0001)
 		print "Count : %d and Count2 : %d" % (mutateCount, mutateCount2)	            # Print Mutate Count
@@ -117,7 +117,7 @@ class file_fuzzer:
 			randOffsetStart = random.randint(0, streamLength-1)				            # Random starting position
 			# Random starting position + 1~4 Byte
 			randOffsetEnd = randOffsetStart+random.randrange(1, 5)
-			streamRand = self.stream[randOffsetStart:randOffsetEnd].encode("hex")    # Save the Position stream
+			streamRand = self.stream[randOffsetStart:randOffsetEnd].encode("hex")       # Save the Position stream
 			streamLen = len(streamRand)/2											    # Save the Stream length
 			badChar = random.choice(self.badChar) * streamLen						    # Choose a bad Character
 			# Move the file descriptor pointer
@@ -133,7 +133,7 @@ class file_fuzzer:
 			randVector = random.choice(random.choice(self.badVector))				   # Choose a bad vector
 			print "randVector : %s" % randVector
 			randLen = len(randVector)											       # Save the vector length
-			copyFd.seek(randOffset)												   # Move the file descriptor pointer
+			copyFd.seek(randOffset)												       # Move the file descriptor pointer
 
 			# Bad character is stored in the stream
 			copyFd.write(randVector)
@@ -200,7 +200,7 @@ class file_fuzzer:
 		eaxoff = self.crashData.find("EAX")		       # Crash log to find EAX Register
 		eip = self.crashData[eipoff+5:eipoff+13]      
 
-		hashdump = hashlib.md5(eip) # Hash the eip register to detect duplicate crashes
+		hashdump = hashlib.md5(eip)                    # Hash the eip register to detect duplicate crashes
 		hashdump = hashdump.hexdigest()
 
 		print "["+ "-"* (len(hashdump)+6) +"]"

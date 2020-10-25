@@ -3,7 +3,6 @@ from pydbg import *
 from pydbg.defines import *
 from ctypes import *
 from operator import itemgetter
-import httplib
 import mimetypes
 import mimetools
 import urllib2
@@ -19,11 +18,6 @@ import time
 import pickle
 import hashlib
 import re
-
-cj = cookielib.CookieJar()
-opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-urllib2.install_opener(opener)
-
 
 class file_fuzzer:
 	def __init__(self, targetProgram, sampleFolder):

@@ -1,5 +1,8 @@
 <RCC>
-  <qresource prefix="icon">
-    <file>C:/Users/dnsdu/OneDrive/바탕 화면/nm.jpg</file>
+  <qresource prefix="img">
+    <file>img/sub-background.png</file>
+    <file>img/main_img.png</file>
+    <file>img/main-background.png</file>
   </qresource>
+  <qresource prefix="newPrefix"/>
 </RCC>

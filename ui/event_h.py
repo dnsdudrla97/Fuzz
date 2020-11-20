@@ -8,17 +8,21 @@ class mainDialog(QDialog, main_.Ui_Dialog):
         QDialog.__init__(self)
         self.setupUi(self)
     
-        self.btn_main_1.clicked.connect(self.openFile)
-        self.btn_main_2.clicked.connect(self.openFile)
+        self.btn_main_1.clicked.connect(self.openProgramPath)
+        self.btn_main_2.clicked.connect(self.openSamplePath)
         self.btn_main_3.clicked.connect(self.enterData)
 
-    def openFile(self, parm):
-        # file path 
+    # program path button
+    def openProgramPath(self):
         fname = QFileDialog.getOpenFileName(self, 'Open file', '*')
-        print(parm)
         self.edit_main_1.setText(fname)
-        self.edit_main_2.setText(fname)
         print(fname)
+        
+    # sample path button
+    def openSamplePath(self):
+        # sample path
+        fname = QFileDialog.getOpenFileName(self, 'Open file', '*')
+        self.edit_main_2.setText(fname)
         
     def enterData(self):
         # translation sub layout

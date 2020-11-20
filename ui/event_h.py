@@ -12,25 +12,18 @@ class mainDialog(QDialog, main_.Ui_Dialog):
         self.btn_main_2.clicked.connect(self.openFile)
         self.btn_main_3.clicked.connect(self.enterData)
 
-    def openFile(self):
+    def openFile(self, parm):
         # file path 
         fname = QFileDialog.getOpenFileName(self, 'Open file', '*')
+        print(parm)
+        self.edit_main_1.setText(fname)
+        self.edit_main_2.setText(fname)
         print(fname)
-    
+        
     def enterData(self):
-        print("Loading")
-        self.stacked.setCurrentIndex(1)
         # translation sub layout
-
-               
-
-
-        
-        
-        
-
-
-
+        print("Loading")
+        self.stacked.setCurrentIndex(1)  
 
 if __name__ == "__main__":        
     app = QApplication(sys.argv)

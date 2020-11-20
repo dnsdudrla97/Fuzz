@@ -19,6 +19,15 @@ import pickle
 import hashlib
 import re
 
+# import event_h
+
+# pyqt4
+from PyQt4.QtGui import *
+import sys
+import sub_
+import main_
+
+#
 class file_fuzzer:
 	def __init__(self, targetProgram, sampleFolder):
 		self.programPath = targetProgram		 # Target program full path
@@ -125,7 +134,7 @@ class file_fuzzer:
 			# Random starting position
 			randOffset = random.randint(0,  streamLength - 1)
 			randVector = random.choice(random.choice(self.badVector))				   # Choose a bad vector
-			print "randVector : %s" % randVector
+			# print "randVector : %s" % randVector
 			randLen = len(randVector)											       # Save the vector length
 			copyFd.seek(randOffset)												       # Move the file descriptor pointer
 
@@ -253,7 +262,7 @@ class file_fuzzer:
 		return DBG_EXCEPTION_NOT_HANDLED
 
 
-
+'''
 def main():
 	parser = optparse.OptionParser("python %prog " + "-t <target Program> -s <sample folder>")
 	parser.add_option('-t', '--target', dest='targetProgram', type='string',help='specify target Profram Pull Path')
@@ -267,11 +276,64 @@ def main():
 		print '[-] You must specify a target file and target Program and file extension'
 		print '[-] python filename.py -h '
 		exit(0)
-
+	
 	print "[*] Binary Fuzzing"
 	fuzzer = file_fuzzer(targetProgram, sampleFolder)
 	fuzzer.fuzz()
 
 
+'''
+class mainDialog(QDialog, main_.Ui_Dialog):
+	def __init__(self):
+		QDialog.__init__(self)
+		self.setupUi(self)
+		self.programPath = ''
+		self.samplePath = ''
+		self.btn_main_1.clicked.connect(self.openProgramPath)
+		self.btn_main_2.clicked.connect(self.openSamplePath)
+		self.btn_main_3.clicked.connect(self.enterData)
+
+    # program path button
+	def openProgramPath(self):
+		fname = QFileDialog.getOpenFileName(self, 'Open file', '*')
+		self.programPath = fname 
+		self.edit_main_1.setText(fname)
+
+    # sample path button
+	def openSamplePath(self):
+        # sample path
+		fname = QFileDialog.getExistingDirectory(self, 'Open file')
+		self.samplePath = fname
+		self.edit_main_2.setText(fname)
+    
+	# next stacked
+	def enterData(self):
+        # translation sub layout
+		print("Loading")
+        # fuzzing class (file_fuzzer)
+	
+		fuzzer = file_fuzzer(str(self.programPath), str(self.samplePath))
+		self.stacked.setCurrentIndex(1) 		
+    	#fuzzer.fuzz()
+		# nextStackThread = threading.Thread(target=fuzzer.fuzz)
+		
+		nextStackThread = threading.Thread(target=fuzzer.fuzz)
+		nextStackThread.setDaemon(1)
+		nextStackThread.start()	
+
+
+
+	
+
+def main():
+	app = QApplication(sys.argv)
+	dlg = mainDialog()
+	dlg.show()
+	app.exec_()
+	
+
 if __name__ == '__main__':
-	main()
+	#dbg_thread start
+	pydbg_thread = threading.Thread(target=main)
+	pydbg_thread.setDaemon(0)
+	pydbg_thread.start()

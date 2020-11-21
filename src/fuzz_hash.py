@@ -5,8 +5,6 @@ from ctypes import *
 from operator import itemgetter
 import mimetypes
 import mimetools
-import urllib2
-import cookielib
 import optparse
 import os
 import sys

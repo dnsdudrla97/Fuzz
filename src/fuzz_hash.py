@@ -22,10 +22,11 @@ import re
 # pyqt4
 from PyQt4.QtGui import *
 import sys
-import messagebox
 import main_
+
 class file_fuzzer(QDialog, main_.Ui_Dialog):
 	def __init__(self, targetProgram, sampleFolder):
+		
 		# pyqt gui init
 		QDialog.__init__(self)
 		self.setupUi(self)
@@ -52,12 +53,18 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
                      	"%%20n", "%%20x", "%%20s", "%#0123456x%08x%x%s%p%d%n%o%u%c%h%l%q%j%z%Z%t%i%e%g%f%a%C%S%08x%%", "%s"*129, "%x"*257, ],
                      ["\x3f\xff", "\xff\x3f", "\x7f\xff", "\xff\x7f","\x80\x00", "\x00\x80", "\xfe\xff", "\xff\xfe", ],
                      ["\x00\x00\x01\x00", "\x00\x01\x00\x00", "\x00\x00\x10\x00", "\x00\x01\x00\x00", "\x00\x00\x01\x00", "\x00\x10\x00\x00", "\x3f\xff\xff\xff", "\xff\xff\xff\x3f", "\x7f\xff\xff\xfe", "\xfe\xff\xff\x7f", "\x7f\xff\xff\xff", "\xff\xff\xff\x7f", "\x80\x00\x00\x00", "\x00\x00\x00\x80", "\xff\xff\xff\xfe", "\xfe\xff\xff\xff", ]]
+	'''
 
+	'''
 	def fuzz(self):
+		'''Returns If there is no sample folder, return
+		Args :				
+		Returns:			
+			If there is no sample folder, return
+		'''
 		while 1:
 			if not self.running:
-				
-				self.clearFile()
+				self.clearFile()											   # caller tmp file (clear)
 
 				self.programCount += 1
 				try:
@@ -65,6 +72,7 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 				except:
 					print "[-] %s folder does not exist." % self.sampleFolder
 					return
+				
 				list_length = len(file_list)
 				self.targetfile = file_list[random.randint(0, list_length-1)]  # Target file Select
 
@@ -72,14 +80,14 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 				self.ext = self.targetfile[-4:]								   # Save the Target file EXT
 				self.stream = fd.read()										   # Save the Target file Stream
 				fd.close()
-				self.mutationFile()											   # Mutate Target file
+				self.mutationFile()											   # Mutate Target file caller
 
 				try:
-					self.dbg.terminate_process()
+					self.dbg.terminate_process()                               
 				except:
 					pass
 
-				#dbg_thread start
+				#startDebugger Method Thread start
 				pydbg_thread = threading.Thread(target=self.startDebugger)
 				pydbg_thread.setDaemon(0)
 				pydbg_thread.start()
@@ -94,7 +102,7 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 				if self.pid == None:
 					print "[-] WARNNING!"
 
-				#monitor_thread start
+				#monitorDebugger Method THread start
 				monitor_thread = threading.Thread(target=self.monitorDebugger)
 				monitor_thread.setDaemon(0)
 				monitor_thread.start()
@@ -103,6 +111,9 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 	
 	# clear file -> _INIT_
 	def clearFile(self):
+		'''
+		clear tmp file		
+		'''
 		try:
 			os.remove(".esp.log")
 		except:
@@ -124,6 +135,13 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 
 	# Fuzz.Mutate Target file
 	def mutationFile(self):
+		'''
+		doc : Testcase creation and mutation work based on seed value
+		return :
+			1. file error
+			2. mutation loop finish
+
+		'''
 		self.mutateDic = {}									                            # Reset Mutate key
 
 		try:
@@ -138,7 +156,6 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 		streamLength = len(self.stream)					                                # Get the Full length of the target file
 		mutateCount = int(streamLength*0.01)
 		mutateCount2 = int(streamLength*0.0001)
-		# print "Count : %d and Count2 : %d" % (mutateCount, mutateCount2)	            # Print Mutate Count
 
 		# Mutate 1
 		for i in range(mutateCount):
@@ -153,6 +170,7 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 			copyFd.write(badChar)													    # Bad character is stored in the stream
 			# Create dictionary for recovery
 			self.mutateDic[randOffsetStart] = streamRand
+
 		# Mutate 2
 		for i in range(mutateCount2):
 			# Random starting position
@@ -167,20 +185,15 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 
 			# Create dictionary for recovery
 			self.mutateDic[randOffset] = self.stream[randOffset:randOffset +randLen].encode("hex")	
-
-		#with open('.tmp_MutateDic.txt', 'w') as f:
-		#	f.write(self.mutateDic)	               	    
-		
-
-			
-		# save mutateDic file (tmp -> thread)
-		
-		
 		copyFd.close()
 		return
 
 	# fuzz start debugger
 	def startDebugger(self):
+		'''
+		doc : Start binary debugging, call checkCrash function when vulnerability is detected
+		return : pid is none
+		'''
 		print "[-] String index : %d \n" % self.programCount,
 		self.running = True
 		self.dbg = pydbg()
@@ -194,7 +207,9 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 
 	# Fuzz.Monitor debugger
 	def monitorDebugger(self):
-		# Sleeps for the specified time and terminates the process
+		'''
+		doc : Sleeps for the specified time and terminates the process
+		'''
 		print "Current Monitoring",
 		
 		counter = 0
@@ -219,6 +234,12 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 		self.running = False
 
 	def checkCrash(self, dbg):
+		'''
+		doc : When a crash is found, the memory information is extracted,
+		the EIP register information is hashed into MD5, and the data is saved,
+		a temporary file is created based on various registry information,
+		and the crash data author is created after the crash file is created.
+		'''
 		try:
 			os.mkdir("crash")
 		except:
@@ -305,7 +326,7 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 			pass
 		return DBG_EXCEPTION_NOT_HANDLED
 
-
+# CLI SETTING MAIN
 '''
 def main():
 	parser = optparse.OptionParser("python %prog " + "-t <target Program> -s <sample folder>")
@@ -326,7 +347,22 @@ def main():
 	fuzzer.fuzz()
 '''
 class mainDialog(QDialog, main_.Ui_Dialog):
+	'''
+	Argv : QDialog : PyQt QDialog class
+	Argv1 : main_.UI_Dialog : PyQt UI class
+	doc : PyQt UI slot, signal processing
+	'''
 	def __init__(self):
+		'''
+		init : 
+			setupUi : PyQt ui setting
+			programPath : fuzzing binary path
+			samplePath : TestCase file path
+			step : ProgressBar process
+			btn_main_1 -> openProgramPath
+			btn_main_2 -> openSamplePath
+			btn_main_3 -> enterData
+		'''
 		QDialog.__init__(self)
 		self.setupUi(self)
 		self.programPath = ''
@@ -338,7 +374,6 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 		self.btn_main_3.clicked.connect(self.enterData)
 
 	
-		# QTextBrowser slot
     # program path button
 	def openProgramPath(self):
 		fname = QFileDialog.getOpenFileName(self, 'Open file', '*')
@@ -369,7 +404,7 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 				self.textBrowser.append("is input?")
 				continue
 							
-			time.sleep(3)
+			time.sleep(3) 
 
 			# event 
 			if self.step == 10:
@@ -384,15 +419,20 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 			
 	# next stacked -> stack thread (0)
 	def enterData(self):
+		'''
+		doc : 2 thread processing
+				1. file_fuzzer class instance
+				2. openCrashFile
+		'''
+
+
         # translation sub layout
 		print("Loading next Stacked")
         # fuzzing class (file_fuzzer)
 	
 		fuzzer = file_fuzzer(str(self.programPath), str(self.samplePath))
 		self.stacked.setCurrentIndex(1) 		
-    	#fuzzer.fuzz()
-		# nextStackThread = threading.Thread(target=fuzzer.fuzz)
-		
+
 		nextStackThread = threading.Thread(target=fuzzer.fuzz)
 		nextStackThread.setDaemon(1) #True is Program exit together
 		nextStackThread.start()	
@@ -404,7 +444,6 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 	
 	# messagebox
 	def showdialog(self):
-		global CRASH_HASH
 		msg = QMessageBox()
 		msg.setIcon(QMessageBox.Information)
 		msg.setText("CRASH DETECTED")
@@ -428,8 +467,6 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 		print "Button pressed is:"
 
 		
-
-
 def main():
 	app = QApplication(sys.argv)
 	dlg = mainDialog()	

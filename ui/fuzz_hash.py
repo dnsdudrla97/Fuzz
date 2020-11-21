@@ -19,12 +19,13 @@ import pickle
 import hashlib
 import re
 
-# import event_h
+# global area
+CRASH_HASH = ''
 
 # pyqt4
 from PyQt4.QtGui import *
 import sys
-import sub_
+import messagebox
 import main_
 class file_fuzzer(QDialog, main_.Ui_Dialog):
 	def __init__(self, targetProgram, sampleFolder):
@@ -131,9 +132,9 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 			# Create dictionary for recovery
 			self.mutateDic[randOffsetStart] = streamRand
 
-			# save mutateDic file
-			with open('tmpMutateDic.txt', 'w') as f:
-				f.write(streamRand)	               	    
+			# save mutateDic file (tmp -> thread)
+			# with open('tmpMutateDic.txt', 'w') as f:
+			# 	f.write(streamRand)	               	    
 
 
 		# Mutate 2
@@ -149,11 +150,7 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 			copyFd.write(randVector)
 
 			# Create dictionary for recovery
-			self.mutateDic[randOffset] = self.stream[randOffset:randOffset +randLen].encode("hex")
-		
-		
-		
-		
+			self.mutateDic[randOffset] = self.stream[randOffset:randOffset +randLen].encode("hex")	
 		
 		
 		copyFd.close()
@@ -224,14 +221,22 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 		eaxoff = self.crashData.find("EAX")		       # Crash log to find EAX Register
 		eip = self.crashData[eipoff+5:eipoff+13]      
 
+
+		# esp
+		espoff_start = self.crashData.find("ESP")
+		espoff_end = self.crashData.find("+00:")
+		esp = self.crashData[espoff_start:espoff_end]
+
 		hashdump = hashlib.md5(eip)                    # Hash the eip register to detect duplicate crashes
 		hashdump = hashdump.hexdigest()
+		CRASH_HASH = hashdump
 		
-		'''
-		print "["+ "-"* (len(hashdump)+6) +"]"
-		print "EIP = %s\nhash = %s\n" % (eip, hashdump),
-		print "["+ "-"* (len(hashdump)+6) +"]"
-		'''
+		# message box crash dee
+		with open(".hash.log", 'w') as f:
+			f.write("EIP = %s\nhash = %s\n" % (eip, hashdump))
+		with open(".esp.log", 'w') as f:
+			f.write(esp)
+
 
 		hashDBFd = open('hashDB.txt', 'r')
 		hashDBData = hashDBFd.read()
@@ -304,17 +309,18 @@ def main():
 	fuzzer = file_fuzzer(targetProgram, sampleFolder)
 	fuzzer.fuzz()
 '''
-class mainDialog(QDialog, main_.Ui_Dialog):
+class mainDialog(QDialog,QWidget, main_.Ui_Dialog):
 	def __init__(self):
 		QDialog.__init__(self)
 		self.setupUi(self)
 		self.programPath = ''
 		self.samplePath = ''
 		self.step = 0
-		# btn slot
+		# mainwindow btn slot
 		self.btn_main_1.clicked.connect(self.openProgramPath)
 		self.btn_main_2.clicked.connect(self.openSamplePath)
 		self.btn_main_3.clicked.connect(self.enterData)
+
 	
 		# QTextBrowser slot
     # program path button
@@ -335,14 +341,20 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 		while True:
 			with open('crashAllInfo.txt', 'r') as f:
 				self.textBrowser_2.append(f.read())
-			with open('tmpMutateDic.txt', 'r') as f:
+			with open('.esp.log', 'r') as f:
 				self.textBrowser.append(f.read())
 			time.sleep(3)
+
+			if self.step == 10:
+				self.showdialog()
 			if self.step >= 100:
 				print("FIN")
 				# message BOx GO?
+
+
 			self.step += 1
 			self.progressBar.setValue(self.step)
+			
 
 	# next stacked
 	def enterData(self):
@@ -364,6 +376,33 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 		openCrashFileThread.setDaemon(0)
 		openCrashFileThread.start()		
 	
+	# widget slot functions
+	def on_close(self): print("TEst")
+
+	# messagebox
+	def showdialog(self):
+		global CRASH_HASH
+		msg = QMessageBox()
+		msg.setIcon(QMessageBox.Information)
+		msg.setText("CRASH DETECTED")
+		msg.setInformativeText("")
+		msg.setWindowTitle("CRASH DETECTED")
+
+		with open(".hash.log", 'r') as f:
+			msg.setDetailedText(f.read())
+
+		# msg.setDetailedText("MD5 %s" % CRASH_HASH)
+		msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+		msg.buttonClicked.connect(self.msgbtn)
+			
+		retval = msg.exec_()
+		print "value of pressed message box button:", retval
+			
+	def msgbtn(self):
+		print "Button pressed is:"
+
+		
+
 
 def main():
 	app = QApplication(sys.argv)

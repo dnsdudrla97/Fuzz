@@ -1,22 +1,22 @@
-0x00d832c5 xchg [eax],eax from thread 18900 caused access violation
+0x00d832c5 xchg [eax],eax from thread 28096 caused access violation
 when attempting to write to 0x00000000
 
 CONTEXT DUMP
   EIP: 00d832c5 xchg [eax],eax
   EAX: 00000000 (         0) -> N/A
-  EBX: 002a1000 (   2756608) -> @]wH(@[wp^w0]wP(pm @Hw3waJ? (heap)
-  ECX: eef001a4 (4008706468) -> N/A
+  EBX: 00203000 (   2109440) -> @]wH(@[wp^w0]wP(pm @Hw3waJ? (heap)
+  ECX: 1bd835cc ( 467154380) -> N/A
   EDX: 00401000 (   4198400) -> N/A
   EDI: 00401000 (   4198400) -> N/A
   ESI: 00401000 (   4198400) -> N/A
   EBP: 00d80ef4 (  14159604) -> N/A
-  ESP: 0019ff28 (   1703720) -> 2@@P*@@8@@t*@l)v*vuw*[*@aw__uw5sw;w@*Actx 2  (stack)
-  +00: 0019ffcc (   1703884) -> w__uw5sw;w@*Actx 2 4|N&DTq24J6[IY-22B,0_P8\^VD( (stack)
+  ESP: 0019ff28 (   1703720) -> 2@@P0 @5@8@@t0 @5l)v0 vuw0 2}0 @aw6AuwXsw;w@0 Actx 2  (stack)
+  +00: 0019ffcc (   1703884) -> w6AuwXsw;w@0 Actx 2 4|N&DTq24J6[IY-22B,0_P8\^VD( (stack)
   +04: 00d832d3 (  14168787) -> N/A
   +08: 00401000 (   4198400) -> N/A
   +0c: 00401000 (   4198400) -> N/A
   +10: 00d80ef4 (  14159604) -> N/A
-  +14: 0019ff50 (   1703760) -> 8@@t*@l)v*vuw*[*@aw__uw5sw;w@*Actx 2 4| (stack)
+  +14: 0019ff50 (   1703760) -> 8@@t0 @5l)v0 vuw0 2}0 @aw6AuwXsw;w@0 Actx 2 4| (stack)
 
 disasm around:
 	0x00d832ae push eax
@@ -34,5 +34,5 @@ disasm around:
 SEH unwind:
 	0019ffcc -> 00d832d3: push ebp
 	0019ffe4 -> 77819990: mov edi,edi
-	ffffffff -> 77827335: nop
+	ffffffff -> 77827358: nop
 

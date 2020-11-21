@@ -59,7 +59,7 @@ import pydbg
 print "Hello, pydbg!"
 ```
 
-- sucess!
+- success!
 
 ## Options (CLI)
 

@@ -209,6 +209,10 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 		self.crashBin.record_crash(dbg)
 		self.crashData = self.crashBin.crash_synopsis()
 
+		# crashData to pull -> Thread
+		with open('crashAllInfo.txt', 'w') as f:
+			f.write(self.crashData)
+
 		'''
 		self.textBrowser.append(self.crashData)
 		self.textBrowser_2.append(self.crashData)
@@ -306,6 +310,7 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 		self.setupUi(self)
 		self.programPath = ''
 		self.samplePath = ''
+		self.step = 0
 		# btn slot
 		self.btn_main_1.clicked.connect(self.openProgramPath)
 		self.btn_main_2.clicked.connect(self.openSamplePath)
@@ -328,23 +333,16 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 	# opeh hashDB Thread function
 	def openCrashFile(self):
 		while True:
-			with open('hashDB.txt', 'r') as f:
+			with open('crashAllInfo.txt', 'r') as f:
 				self.textBrowser_2.append(f.read())
 			with open('tmpMutateDic.txt', 'r') as f:
 				self.textBrowser.append(f.read())
-			print("LOADING FILE")
 			time.sleep(3)
-	
-
-	# open Mutation Thread function
-	# def openMutationFile(self):
-	# 	while True:
-	# 		with open('tmpMutateDic.txt', 'r') as f:
-	# 			self.textBrowser.append(f.read())
-	# 		print("MUTATION FILE")
-	# 		time.sleep(3)
-	
-
+			if self.step >= 100:
+				print("FIN")
+				# message BOx GO?
+			self.step += 1
+			self.progressBar.setValue(self.step)
 
 	# next stacked
 	def enterData(self):
@@ -365,13 +363,6 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 		openCrashFileThread = threading.Thread(target=self.openCrashFile)
 		openCrashFileThread.setDaemon(0)
 		openCrashFileThread.start()		
-
-		# textBrowser testing file save to load
-		# openMutationFileThread = threading.Thread(target=self.openMutationFile)
-		# openMutationFileThread.setDaemon(0)
-		# openMutationFileThread.start()		
-
-		
 	
 
 def main():

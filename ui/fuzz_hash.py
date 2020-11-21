@@ -26,10 +26,13 @@ from PyQt4.QtGui import *
 import sys
 import sub_
 import main_
-
-#
-class file_fuzzer:
+class file_fuzzer(QDialog, main_.Ui_Dialog):
 	def __init__(self, targetProgram, sampleFolder):
+		# pyqt gui init
+		QDialog.__init__(self)
+		self.setupUi(self)
+
+		# fuzz init
 		self.programPath = targetProgram		 # Target program full path
 		self.sampleFolder = sampleFolder	     # Folder with samples to be transformed
 		self.ext = ""					         # target format
@@ -43,7 +46,7 @@ class file_fuzzer:
 		self.running = False				     # running 
 		self.stream = None
 		self.crashBin = None
-		self.crashData = None
+		self.crashData = None # event to class -> mainDialog
 		self.badChar = ["\x00", "\x41", "\xff", "\x0c", "\xAA"]
 		self.badVector = [[os.urandom(4), os.urandom(4), os.urandom(4), os.urandom(4), os.urandom(4), "\x00\x00\x00\x00", "\xff\xff\xff\xff", ],
                      ["A"*5, "A"*17, "A"*33, "A"*65, "A"*129, "A"*257, "A" *513, "A"*1024, "A"*2049, "A"*4097, "A"*8193, "A"*12288, ],
@@ -51,7 +54,6 @@ class file_fuzzer:
                      	"%%20n", "%%20x", "%%20s", "%#0123456x%08x%x%s%p%d%n%o%u%c%h%l%q%j%z%Z%t%i%e%g%f%a%C%S%08x%%", "%s"*129, "%x"*257, ],
                      ["\x3f\xff", "\xff\x3f", "\x7f\xff", "\xff\x7f","\x80\x00", "\x00\x80", "\xfe\xff", "\xff\xfe", ],
                      ["\x00\x00\x01\x00", "\x00\x01\x00\x00", "\x00\x00\x10\x00", "\x00\x01\x00\x00", "\x00\x00\x01\x00", "\x00\x10\x00\x00", "\x3f\xff\xff\xff", "\xff\xff\xff\x3f", "\x7f\xff\xff\xfe", "\xfe\xff\xff\x7f", "\x7f\xff\xff\xff", "\xff\xff\xff\x7f", "\x80\x00\x00\x00", "\x00\x00\x00\x80", "\xff\xff\xff\xfe", "\xfe\xff\xff\xff", ]]
-
 	def fuzz(self):
 		while 1:
 			if not self.running:
@@ -104,7 +106,7 @@ class file_fuzzer:
 		try:
 			copyFd = open(self.copyFile+self.ext, "w+b")	                            # Copy File Open(w+b)
 			copyFd.write(self.stream)						                            # Save the File Stream
-			print "[-] Mutate %s" % self.targetfile,		               	            # Print Target File Name
+			print "[-] Mutate %s" % self.targetfile,	
 		except:
 			print "[-] File Copy Failed"
 			return
@@ -113,7 +115,7 @@ class file_fuzzer:
 		streamLength = len(self.stream)					                                # Get the Full length of the target file
 		mutateCount = int(streamLength*0.01)
 		mutateCount2 = int(streamLength*0.0001)
-		print "Count : %d and Count2 : %d" % (mutateCount, mutateCount2)	            # Print Mutate Count
+		# print "Count : %d and Count2 : %d" % (mutateCount, mutateCount2)	            # Print Mutate Count
 
 		# Mutate 1
 		for i in range(mutateCount):
@@ -128,6 +130,11 @@ class file_fuzzer:
 			copyFd.write(badChar)													    # Bad character is stored in the stream
 			# Create dictionary for recovery
 			self.mutateDic[randOffsetStart] = streamRand
+
+			# save mutateDic file
+			with open('tmpMutateDic.txt', 'w') as f:
+				f.write(streamRand)	               	    
+
 
 		# Mutate 2
 		for i in range(mutateCount2):
@@ -144,7 +151,11 @@ class file_fuzzer:
 			# Create dictionary for recovery
 			self.mutateDic[randOffset] = self.stream[randOffset:randOffset +randLen].encode("hex")
 		
-
+		
+		
+		
+		
+		
 		copyFd.close()
 		return
 
@@ -198,17 +209,25 @@ class file_fuzzer:
 		self.crashBin.record_crash(dbg)
 		self.crashData = self.crashBin.crash_synopsis()
 
-		print self.crashData
+		'''
+		self.textBrowser.append(self.crashData)
+		self.textBrowser_2.append(self.crashData)
+		'''
+
+
+		# print self.crashData
 		eipoff = self.crashData.find("EIP")		       # Crash log to find EIP Register
 		eaxoff = self.crashData.find("EAX")		       # Crash log to find EAX Register
 		eip = self.crashData[eipoff+5:eipoff+13]      
 
 		hashdump = hashlib.md5(eip)                    # Hash the eip register to detect duplicate crashes
 		hashdump = hashdump.hexdigest()
-
+		
+		'''
 		print "["+ "-"* (len(hashdump)+6) +"]"
 		print "EIP = %s\nhash = %s\n" % (eip, hashdump),
 		print "["+ "-"* (len(hashdump)+6) +"]"
+		'''
 
 		hashDBFd = open('hashDB.txt', 'r')
 		hashDBData = hashDBFd.read()
@@ -280,8 +299,6 @@ def main():
 	print "[*] Binary Fuzzing"
 	fuzzer = file_fuzzer(targetProgram, sampleFolder)
 	fuzzer.fuzz()
-
-
 '''
 class mainDialog(QDialog, main_.Ui_Dialog):
 	def __init__(self):
@@ -289,10 +306,12 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 		self.setupUi(self)
 		self.programPath = ''
 		self.samplePath = ''
+		# btn slot
 		self.btn_main_1.clicked.connect(self.openProgramPath)
 		self.btn_main_2.clicked.connect(self.openSamplePath)
 		self.btn_main_3.clicked.connect(self.enterData)
-
+	
+		# QTextBrowser slot
     # program path button
 	def openProgramPath(self):
 		fname = QFileDialog.getOpenFileName(self, 'Open file', '*')
@@ -306,10 +325,31 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 		self.samplePath = fname
 		self.edit_main_2.setText(fname)
     
+	# opeh hashDB Thread function
+	def openCrashFile(self):
+		while True:
+			with open('hashDB.txt', 'r') as f:
+				self.textBrowser_2.append(f.read())
+			with open('tmpMutateDic.txt', 'r') as f:
+				self.textBrowser.append(f.read())
+			print("LOADING FILE")
+			time.sleep(3)
+	
+
+	# open Mutation Thread function
+	# def openMutationFile(self):
+	# 	while True:
+	# 		with open('tmpMutateDic.txt', 'r') as f:
+	# 			self.textBrowser.append(f.read())
+	# 		print("MUTATION FILE")
+	# 		time.sleep(3)
+	
+
+
 	# next stacked
 	def enterData(self):
         # translation sub layout
-		print("Loading")
+		print("Loading next Stacked")
         # fuzzing class (file_fuzzer)
 	
 		fuzzer = file_fuzzer(str(self.programPath), str(self.samplePath))
@@ -318,16 +358,25 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 		# nextStackThread = threading.Thread(target=fuzzer.fuzz)
 		
 		nextStackThread = threading.Thread(target=fuzzer.fuzz)
-		nextStackThread.setDaemon(1)
+		nextStackThread.setDaemon(1) #True is Program exit together
 		nextStackThread.start()	
+		
+		# textBrowser_2 testing file save to load
+		openCrashFileThread = threading.Thread(target=self.openCrashFile)
+		openCrashFileThread.setDaemon(0)
+		openCrashFileThread.start()		
 
+		# textBrowser testing file save to load
+		# openMutationFileThread = threading.Thread(target=self.openMutationFile)
+		# openMutationFileThread.setDaemon(0)
+		# openMutationFileThread.start()		
 
-
+		
 	
 
 def main():
 	app = QApplication(sys.argv)
-	dlg = mainDialog()
+	dlg = mainDialog()	
 	dlg.show()
 	app.exec_()
 	

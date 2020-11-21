@@ -19,9 +19,6 @@ import pickle
 import hashlib
 import re
 
-# global area
-CRASH_HASH = ''
-
 # pyqt4
 from PyQt4.QtGui import *
 import sys
@@ -55,9 +52,13 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
                      	"%%20n", "%%20x", "%%20s", "%#0123456x%08x%x%s%p%d%n%o%u%c%h%l%q%j%z%Z%t%i%e%g%f%a%C%S%08x%%", "%s"*129, "%x"*257, ],
                      ["\x3f\xff", "\xff\x3f", "\x7f\xff", "\xff\x7f","\x80\x00", "\x00\x80", "\xfe\xff", "\xff\xfe", ],
                      ["\x00\x00\x01\x00", "\x00\x01\x00\x00", "\x00\x00\x10\x00", "\x00\x01\x00\x00", "\x00\x00\x01\x00", "\x00\x10\x00\x00", "\x3f\xff\xff\xff", "\xff\xff\xff\x3f", "\x7f\xff\xff\xfe", "\xfe\xff\xff\x7f", "\x7f\xff\xff\xff", "\xff\xff\xff\x7f", "\x80\x00\x00\x00", "\x00\x00\x00\x80", "\xff\xff\xff\xfe", "\xfe\xff\xff\xff", ]]
+
 	def fuzz(self):
 		while 1:
 			if not self.running:
+				
+				self.clearFile()
+
 				self.programCount += 1
 				try:
 					file_list = os.listdir(self.sampleFolder)				   # Made the list
@@ -99,6 +100,27 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 				monitor_thread.start()
 			else:
 				time.sleep(1)
+	
+	# clear file -> _INIT_
+	def clearFile(self):
+		try:
+			os.remove(".esp.log")
+		except:
+			pass
+		try:
+			os.remove("crashAllInfo.txt")
+		except:
+			pass
+		try:
+			os.remove(".hash.log")
+		except:
+			pass
+		try:
+			os.remove(".tmp_MutateDic.txt")
+		except:
+			pass
+		return
+
 
 	# Fuzz.Mutate Target file
 	def mutationFile(self):
@@ -131,12 +153,6 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 			copyFd.write(badChar)													    # Bad character is stored in the stream
 			# Create dictionary for recovery
 			self.mutateDic[randOffsetStart] = streamRand
-
-			# save mutateDic file (tmp -> thread)
-			# with open('tmpMutateDic.txt', 'w') as f:
-			# 	f.write(streamRand)	               	    
-
-
 		# Mutate 2
 		for i in range(mutateCount2):
 			# Random starting position
@@ -151,6 +167,13 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 
 			# Create dictionary for recovery
 			self.mutateDic[randOffset] = self.stream[randOffset:randOffset +randLen].encode("hex")	
+
+		#with open('.tmp_MutateDic.txt', 'w') as f:
+		#	f.write(self.mutateDic)	               	    
+		
+
+			
+		# save mutateDic file (tmp -> thread)
 		
 		
 		copyFd.close()
@@ -210,12 +233,6 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 		with open('crashAllInfo.txt', 'w') as f:
 			f.write(self.crashData)
 
-		'''
-		self.textBrowser.append(self.crashData)
-		self.textBrowser_2.append(self.crashData)
-		'''
-
-
 		# print self.crashData
 		eipoff = self.crashData.find("EIP")		       # Crash log to find EIP Register
 		eaxoff = self.crashData.find("EAX")		       # Crash log to find EAX Register
@@ -229,9 +246,8 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 
 		hashdump = hashlib.md5(eip)                    # Hash the eip register to detect duplicate crashes
 		hashdump = hashdump.hexdigest()
-		CRASH_HASH = hashdump
 		
-		# message box crash dee
+		# message box crash -> thread 
 		with open(".hash.log", 'w') as f:
 			f.write("EIP = %s\nhash = %s\n" % (eip, hashdump))
 		with open(".esp.log", 'w') as f:
@@ -309,7 +325,7 @@ def main():
 	fuzzer = file_fuzzer(targetProgram, sampleFolder)
 	fuzzer.fuzz()
 '''
-class mainDialog(QDialog,QWidget, main_.Ui_Dialog):
+class mainDialog(QDialog, main_.Ui_Dialog):
 	def __init__(self):
 		QDialog.__init__(self)
 		self.setupUi(self)
@@ -339,12 +355,23 @@ class mainDialog(QDialog,QWidget, main_.Ui_Dialog):
 	# opeh hashDB Thread function
 	def openCrashFile(self):
 		while True:
-			with open('crashAllInfo.txt', 'r') as f:
-				self.textBrowser_2.append(f.read())
-			with open('.esp.log', 'r') as f:
-				self.textBrowser.append(f.read())
+			try:
+				with open('crashAllInfo.txt', 'r') as f:
+					self.textBrowser_2.append(f.read())
+			except:
+				self.textBrowser_2.append("not crash")
+				continue
+			
+			try:
+				with open('.esp.log', 'r') as f:
+					self.textBrowser.append(f.read())
+			except:
+				self.textBrowser.append("is input?")
+				continue
+							
 			time.sleep(3)
 
+			# event 
 			if self.step == 10:
 				self.showdialog()
 			if self.step >= 100:
@@ -355,8 +382,7 @@ class mainDialog(QDialog,QWidget, main_.Ui_Dialog):
 			self.step += 1
 			self.progressBar.setValue(self.step)
 			
-
-	# next stacked
+	# next stacked -> stack thread (0)
 	def enterData(self):
         # translation sub layout
 		print("Loading next Stacked")
@@ -376,9 +402,6 @@ class mainDialog(QDialog,QWidget, main_.Ui_Dialog):
 		openCrashFileThread.setDaemon(0)
 		openCrashFileThread.start()		
 	
-	# widget slot functions
-	def on_close(self): print("TEst")
-
 	# messagebox
 	def showdialog(self):
 		global CRASH_HASH
@@ -388,8 +411,11 @@ class mainDialog(QDialog,QWidget, main_.Ui_Dialog):
 		msg.setInformativeText("")
 		msg.setWindowTitle("CRASH DETECTED")
 
-		with open(".hash.log", 'r') as f:
-			msg.setDetailedText(f.read())
+		try:		
+			with open(".hash.log", 'r') as f:
+				msg.setDetailedText(f.read())
+		except:
+			msg.setDetailedText("NOT CRASH")
 
 		# msg.setDetailedText("MD5 %s" % CRASH_HASH)
 		msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)

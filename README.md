@@ -71,8 +71,8 @@ print "Hello, pydbg!"
 
 ## BluePrint (GUI)
 
-![/tmp/img/Bl-8.png](/tmp/img/Bl-8.png){: width="70%" height="70%"}
+![/tmp/img/Bl-8.png](/tmp/img/Bl-8.png)
 
-![/tmp/img/Bl-10.png](/tmp/img/Bl-10.png){: width="70%" height="70%"}
+![/tmp/img/Bl-10.png](/tmp/img/Bl-10.png)
 
-![/tmp/img/Bl-9.png](/tmp/img/Bl-9.png){: width="70%" height="70%"}
+![/tmp/img/Bl-9.png](/tmp/img/Bl-9.png)

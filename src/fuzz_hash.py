@@ -393,17 +393,18 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 					self.textBrowser_2.append(f.read())
 			except:
 				self.textBrowser_2.append("not crash")
-				continue
+				# continue
 			
 			try:
 				with open('.esp.log', 'r') as f:
 					self.textBrowser.append(f.read())
 			except:
 				self.textBrowser.append("is input?")
-				continue
+				# continue
 							
 			time.sleep(3) 
 
+			# add step is the vuln detected before 'crashAllInfo file into the emtpy comapre so alert!!""
 			# event 
 			if self.step == 10:
 				self.showdialog()

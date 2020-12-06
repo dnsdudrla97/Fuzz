@@ -309,7 +309,6 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 			crashLogPath = os.getcwd() + "\\" + crashLogPath
 			mutateDumpPath = os.getcwd() + "\\" + mutateDumpPath
 			self.crashData = "target Prog = %s \n %s" % (self.programPath, self.crashData)
-			#self.upload(orignPath, crashPath, self.crashData, mutateDumpPath)
 
 		else:
 			print "\n[-] same Crash hash : %s " % hashdump
@@ -422,8 +421,6 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 			self.doPathMessageBox() # 
 			return
 		else:			
-			# print(self.programPath)
-			# print(self.samplePath)
 			fuzzer = file_fuzzer(str(self.programPath), str(self.samplePath))
 			self.stacked.setCurrentIndex(1) 		
 
@@ -457,7 +454,6 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 		except:
 			crashMsg.setDetailedText("NOT CRASH")
 
-		# crashMsg.setDetailedText("MD5 %s" % CRASH_HASH)
 		crashMsg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
 		crashMsg.buttonClicked.connect(self.msgbtn)
 			
@@ -473,7 +469,6 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 		msg.setText("FILE PATH")
 		msg.setWindowTitle("INPUT FILE PATH")
 
-		# msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
 		msg.buttonClicked.connect(self.msgbtn)
 		retval = msg.exec_()
 		print "value of pressed message box button:", retval

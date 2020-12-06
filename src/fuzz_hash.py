@@ -366,6 +366,7 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 		self.programPath = ''
 		self.samplePath = ''
 		self.step = 0
+		self.check = 0
 		# mainwindow btn slot
 		self.btn_main_1.clicked.connect(self.openProgramPath)
 		self.btn_main_2.clicked.connect(self.openSamplePath)
@@ -391,30 +392,23 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 			try:
 				with open('crashAllInfo.txt', 'r') as f:
 					self.textBrowser_2.append(f.read())
+					self.crashMessageBox()
 			except:
 				self.textBrowser_2.append("not crash")
-				# continue
 			
 			try:
 				with open('.esp.log', 'r') as f:
 					self.textBrowser.append(f.read())
 			except:
 				self.textBrowser.append("is input?")
-				# continue
 							
 			time.sleep(3) 
-
-			# add step is the vuln detected before 'crashAllInfo file into the emtpy comapre so alert!!""
-			# event 
-			if self.step == 10:
-				self.showdialog()
+		
 			if self.step >= 100:
 				print("FIN")
-				# message BOx GO?
-
-
-			self.step += 1
-			self.progressBar.setValue(self.step)
+			else:
+				self.step += 1
+				self.progressBar.setValue(self.step)
 			
 	# next stacked -> stack thread (0)
 	def enterData(self):
@@ -423,47 +417,67 @@ class mainDialog(QDialog, main_.Ui_Dialog):
 				1. file_fuzzer class instance
 				2. openCrashFile
 		'''
+		# You did not write down the file path. (break)
+		if 0 == len(self.programPath) & 0 == len(self.samplePath):
+			self.doPathMessageBox() # 
+			return
+		else:			
+			# print(self.programPath)
+			# print(self.samplePath)
+			fuzzer = file_fuzzer(str(self.programPath), str(self.samplePath))
+			self.stacked.setCurrentIndex(1) 		
+
+			nextStackThread = threading.Thread(target=fuzzer.fuzz)
+			nextStackThread.setDaemon(1) #True is Program exit together
+			nextStackThread.start()	
+			
+			# textBrowser_2 testing file save to load
+			openCrashFileThread = threading.Thread(target=self.openCrashFile)
+			openCrashFileThread.setDaemon(0)
+			openCrashFileThread.start()
 
 
-        # translation sub layout
-		print("Loading next Stacked")
-        # fuzzing class (file_fuzzer)
+
+
+	# message box ok
+	def msgbtn(self):
+		print "Button pressed is:"
 	
-		fuzzer = file_fuzzer(str(self.programPath), str(self.samplePath))
-		self.stacked.setCurrentIndex(1) 		
-
-		nextStackThread = threading.Thread(target=fuzzer.fuzz)
-		nextStackThread.setDaemon(1) #True is Program exit together
-		nextStackThread.start()	
-		
-		# textBrowser_2 testing file save to load
-		openCrashFileThread = threading.Thread(target=self.openCrashFile)
-		openCrashFileThread.setDaemon(0)
-		openCrashFileThread.start()		
-	
-	# messagebox
-	def showdialog(self):
-		msg = QMessageBox()
-		msg.setIcon(QMessageBox.Information)
-		msg.setText("CRASH DETECTED")
-		msg.setInformativeText("")
-		msg.setWindowTitle("CRASH DETECTED")
+	# crash messagebox
+	def crashMessageBox(self):
+		crashMsg = QMessageBox()
+		crashMsg.setIcon(QMessageBox.Information)
+		crashMsg.setText("CRASH DETECTED")
+		crashMsg.setInformativeText("")
+		crashMsg.setWindowTitle("CRASH DETECTED")
 
 		try:		
 			with open(".hash.log", 'r') as f:
-				msg.setDetailedText(f.read())
+				crashMsg.setDetailedText(f.read())
 		except:
-			msg.setDetailedText("NOT CRASH")
+			crashMsg.setDetailedText("NOT CRASH")
 
-		# msg.setDetailedText("MD5 %s" % CRASH_HASH)
-		msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-		msg.buttonClicked.connect(self.msgbtn)
+		# crashMsg.setDetailedText("MD5 %s" % CRASH_HASH)
+		crashMsg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+		crashMsg.buttonClicked.connect(self.msgbtn)
 			
-		retval = msg.exec_()
+		retval = crashMsg.exec_()
 		print "value of pressed message box button:", retval
 			
-	def msgbtn(self):
-		print "Button pressed is:"
+
+	
+	# not push file path messagebox
+	def doPathMessageBox(self):
+		msg = QMessageBox()
+		msg.setIcon(QMessageBox.Critical)
+		msg.setText("FILE PATH")
+		msg.setWindowTitle("INPUT FILE PATH")
+
+		# msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+		msg.buttonClicked.connect(self.msgbtn)
+		retval = msg.exec_()
+		print "value of pressed message box button:", retval
+		
 
 		
 def main():

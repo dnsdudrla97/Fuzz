@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 import main_rc
+
 from PyQt4 import QtCore, QtGui
 
 try:
@@ -27,6 +28,9 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName(_fromUtf8("Dialog"))
         Dialog.resize(875, 545)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/img/img/main-icon.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        Dialog.setWindowIcon(icon)
         Dialog.setStyleSheet(_fromUtf8("background-color: rgb(44, 45, 49);"))
         self.horizontalLayout_4 = QtGui.QHBoxLayout(Dialog)
         self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
@@ -242,7 +246,7 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog", None))
+        Dialog.setWindowTitle(_translate("Dialog", "FUZZ FUZZ", None))
         self.btn_main_3.setText(_translate("Dialog", "START", None))
         self.label_program_path.setText(_translate("Dialog", "<html><head/><body><p><span style=\" font-weight:600; color:#ffffff;\">Program Path</span></p></body></html>", None))
         self.btn_main_1.setText(_translate("Dialog", "...", None))
@@ -258,4 +262,14 @@ class Ui_Dialog(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Samsung Sans\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#ffffff;\"><br /></p></body></html>", None))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtGui.QApplication(sys.argv)
+    Dialog = QtGui.QDialog()
+    ui = Ui_Dialog()
+    ui.setupUi(Dialog)
+    Dialog.show()
+    sys.exit(app.exec_())
 

@@ -1,8 +1,8 @@
 <RCC>
   <qresource prefix="img">
+    <file>img/main-icon.png</file>
     <file>img/sub-background.png</file>
     <file>img/main_img.png</file>
     <file>img/main-background.png</file>
   </qresource>
-  <qresource prefix="newPrefix"/>
 </RCC>

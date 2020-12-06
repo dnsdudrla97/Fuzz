@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>FUZZ FUZZ</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="myres.qrc">
+    <normaloff>:/img/img/main-icon.png</normaloff>:/img/img/main-icon.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(44, 45, 49);</string>

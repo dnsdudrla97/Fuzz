@@ -44,6 +44,8 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 		self.stream = None
 		self.crashBin = None
 		self.crashData = None # event to class -> mainDialog
+		# 
+		self.payload = b''
 		self.badChar = ["\x00", "\x41", "\xff", "\x0c", "\xAA"]
 		self.badVector = [[os.urandom(4), os.urandom(4), os.urandom(4), os.urandom(4), os.urandom(4), "\x00\x00\x00\x00", "\xff\xff\xff\xff", ],
                      ["A"*5, "A"*17, "A"*33, "A"*65, "A"*129, "A"*257, "A" *513, "A"*1024, "A"*2049, "A"*4097, "A"*8193, "A"*12288, ],
@@ -196,7 +198,12 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 		self.running = True
 		self.dbg = pydbg()
 		self.dbg.set_callback(EXCEPTION_ACCESS_VIOLATION, self.checkCrash)
-		pid = self.dbg.load(self.programPath, self.copyFile+self.ext)
+		
+		# pid = self.dbg.load(self.programPath, self.copyFile+self.ext)
+		with open(self.copyFile+self.ext, 'rb') as f:
+			self.payload = f.read()
+		pid = self.dbg.load(self.programPath, self.payload)
+
 		self.pid = self.dbg.pid
 		self.dbg.run()
 
@@ -276,7 +283,8 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 		hashDBFd = open('hashDB.txt', 'r')
 		hashDBData = hashDBFd.read()
 		hashDBFd.close()
-
+		
+		# Other crashes are saved in the crash file.
 		if not bool(re.search(hashdump, hashDBData)):
 			try:
 				hashFd = open('hashDB.txt', 'a')

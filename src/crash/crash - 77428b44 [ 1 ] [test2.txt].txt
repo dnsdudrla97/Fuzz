@@ -1,0 +1,50 @@
+target Prog = C:/Users/dnsdu/source/repos/sa,ple/Release/sample.exe 
+0x77428b44 mov edi,[edi+0x4] from thread 31284 caused access violation
+when attempting to read from 0x85e28143
+
+CONTEXT DUMP
+  EIP: 77428b44 mov edi,[edi+0x4]
+  EAX: ab3fb085 (2873077893) -> N/A
+  EBX: 00000000 (         0) -> N/A
+  ECX: 7320733d (1931506493) -> N/A
+  EDX: 85e2812f (2246213935) -> N/A
+  EDI: 85e2813f (2246213951) -> N/A
+  ESI: 00000001 (         1) -> N/A
+  EBP: 00aff770 (  11532144) -> N/A
+  ESP: 00aff6e8 (  11532008) -> Ms@[Ow$p|Bw^BwT-?/?Dwum@BwXs$szu-s (stack)
+  +00: 738f844d (1938785357) -> N/A
+  +04: 774f5b40 (2001689408) -> N/A
+  +08: 00000000 (         0) -> N/A
+  +0c: 00000000 (         0) -> N/A
+  +10: 00000000 (         0) -> N/A
+  +14: 00000000 (         0) -> N/A
+
+disasm around:
+	0x77428b35 inc esi
+	0x77428b36 cmp edi,0x774f5d9c
+	0x77428b3c jz 0x77428bb1
+	0x77428b3e lea edx,[edi-0x10]
+	0x77428b41 mov [ebp-0x24],edx
+	0x77428b44 mov edi,[edi+0x4]
+	0x77428b47 mov [ebp-0x20],edi
+	0x77428b4a mov eax,[edx+0x1c]
+	0x77428b4d mov [ebp-0x28],eax
+	0x77428b50 test eax,eax
+	0x77428b52 jz 0x77428b36
+
+stack unwind:
+	7742a9f5
+	75444113
+	76e9450d
+	76e94381
+	00e912d2
+	7543fa29
+	774375f4
+	774375c4
+
+SEH unwind:
+	00aff8c4 -> 77449990: mov edi,edi
+	00aff930 -> 00e918cb: push ebp
+	00aff948 -> 77449990: mov edi,edi
+	ffffffff -> 7745733f: nop
+

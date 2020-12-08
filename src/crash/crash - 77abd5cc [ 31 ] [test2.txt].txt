@@ -1,0 +1,63 @@
+target Prog = C:/Users/dnsdu/source/repos/sa,ple/Release/sample.exe 
+0x77abd5cc mov eax,[eax] from thread 24496 caused access violation
+when attempting to read from 0x893f9095
+
+CONTEXT DUMP
+  EIP: 77abd5cc mov eax,[eax]
+  EAX: 893f9095 (2302644373) -> N/A
+  EBX: 00000000 (         0) -> N/A
+  ECX: 00dc78c8 (  14448840) -> ?????????????????????????????????????????????????? (heap)
+  EDX: 00000003 (         3) -> N/A
+  EDI: 00000003 (         3) -> N/A
+  ESI: 00831000 (   8589312) ->  V_`pw (heap)
+  EBP: 00aff260 (  11530848) ->  V_`pw (heap)
+  ESP: 00aff260 (  11530848) -> x<wt<w<wmvLvL\U82vrc8Ls\c,Pe,RvX7(v8v4TOvL(v$|v(v (stack)
+  +00: 00aff278 (  11530872) -> mvLvL\U82vrc8Ls\c,Pe,RvX7(v8v4TOvL(v$|v(v(v (stack)
+  +04: 773c149b (2000426139) -> N/A
+  +08: 00000003 (         3) -> N/A
+  +0c: 00aff274 (  11530868) -> <wmvLvL\U82vrc8Ls\c,Pe,RvX7(v8v4TOvL(v$|v(v(v (stack)
+  +10: 773c1480 (2000426112) -> N/A
+  +14: 773c1480 (2000426112) -> N/A
+
+disasm around:
+	0x77abd5c0 test eax,eax
+	0x77abd5c2 jz 0x77abd5d9
+	0x77abd5c4 lea eax,[eax+edx*4]
+	0x77abd5c7 add eax,0x4
+	0x77abd5ca jz 0x77abd5d9
+	0x77abd5cc mov eax,[eax]
+	0x77abd5ce mov ecx,[ebp+0xc]
+	0x77abd5d1 mov [ecx],eax
+	0x77abd5d3 xor eax,eax
+	0x77abd5d5 pop ebp
+	0x77abd5d6 retn 0x8
+
+stack unwind:
+	773c149b
+	769f126d
+	769e9232
+	769e9152
+	76a34fc0
+	769e8c1a
+	769e44d5
+	769e5c7f
+	769e5bcd
+	769e59d7
+	769e47c1
+	769e46f7
+	769e46c7
+	769e466c
+	0064103a
+	006410ac
+	006412a4
+	75c3fa29
+	77ac75f4
+	77ac75c4
+
+SEH unwind:
+	00aff894 -> 76a21fc0: mov edi,edi
+	00aff974 -> 76a21fc0: mov edi,edi
+	00aff9e0 -> 0064191b: push ebp
+	00aff9f8 -> 77ad9990: mov edi,edi
+	ffffffff -> 77ae7343: nop
+

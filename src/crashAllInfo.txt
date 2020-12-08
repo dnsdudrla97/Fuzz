@@ -1,0 +1,37 @@
+0x00c61099 mov [edx+eax-0x1],cl from thread 22968 caused access violation
+when attempting to write to 0x00540000
+
+CONTEXT DUMP
+  EIP: 00c61099 mov [edx+eax-0x1],cl
+  EAX: 005c167b (   6035067) -> n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn% (heap)
+  EBX: 005b3fa0 (   5980064) -> D3D9 (heap)
+  ECX: dad46225 (3671351845) -> N/A
+  EDX: fff7e986 (4294437254) -> N/A
+  EDI: 005a74b8 (   5928120) -> uZuZuZ8vZxvZvZwZ(wZXwZwZwZwZwZ(xZPxZpxZxZxZyZZZ yZHyZ`ZpyZyZZZZHZpZ Z@ZZZZZ0Z`ZZZZZ Z@ZhZZZZpZZsALLUSERSPROFILE=C:\ProgramDatas (heap)
+  ESI: 76a75210 (1990677008) -> N/A
+  EBP: 0053fd88 (   5504392) -> N/A
+  ESP: 0053fd40 (   5504320) -> \=%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%nAhhn%x%p%hn%n%hhn%xAA%hn%n%hhn% (stack)
+  +00: 005c1380 (   6034304) -> \\C:/Users/dnsdu/source/repos/sa,ple/Release/sample.exe%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn% (heap)
+  +04: 003dc000 (   4046848) -> ]w'ZZ@[wpu0]wsPs(m @Hw3waJ? (heap)
+  +08: 70257825 (1881503781) -> N/A
+  +0c: 256e6825 ( 627992613) -> N/A
+  +10: 6868256e (1751655790) -> N/A
+  +14: 2578256e ( 628630894) -> N/A
+
+disasm around:
+	0x00c6108c add esp,0x10
+	0x00c6108f mov eax,[eax+0x4]
+	0x00c61092 sub edx,eax
+	0x00c61094 mov cl,[eax]
+	0x00c61096 lea eax,[eax+0x1]
+	0x00c61099 mov [edx+eax-0x1],cl
+	0x00c6109d test cl,cl
+	0x00c6109f jnz 0xc61094
+	0x00c610a1 lea eax,[ebp-0x40]
+	0x00c610a4 push eax
+	0x00c610a5 call 0xc61010
+
+SEH unwind:
+	6e682570 -> 68256e25: Unable to disassemble at 68256e25
+	ffffffff -> ffffffff: Unable to disassemble at ffffffff
+

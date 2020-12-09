@@ -44,7 +44,7 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 		self.stream = None
 		self.crashBin = None
 		self.crashData = None # event to class -> mainDialog
-		# 
+
 		self.payload = b''
 		self.badChar = ["\x00", "\x41", "\xff", "\x0c", "\xAA"]
 		self.badVector = [[os.urandom(4), os.urandom(4), os.urandom(4), os.urandom(4), os.urandom(4), "\x00\x00\x00\x00", "\xff\xff\xff\xff", ],
@@ -56,6 +56,7 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 	'''
 
 	'''
+
 	def fuzz(self):
 		'''Returns If there is no sample folder, return
 		Args :				

@@ -1,0 +1,38 @@
+target Prog = C:/Users/dnsdu/source/repos/sa,ple/Release/sample.exe 
+0x002b1099 mov [edx+eax-0x1],cl from thread 19764 caused access violation
+when attempting to write to 0x00900000
+
+CONTEXT DUMP
+  EIP: 002b1099 mov [edx+eax-0x1],cl
+  EAX: 009435af (   9713071) -> hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%h (heap)
+  EBX: 00934900 (   9652480) -> DDRAW (heap)
+  ECX: 83475225 (2202489381) -> N/A
+  EDX: fffbca52 (4294691410) -> N/A
+  EDI: 0092b088 (   9613448) -> h(pH@ 0` Hp X0` 8p  `b8!ALLUSERSPROFILE=C:\ProgramData (heap)
+  ESI: 76a75210 (1990677008) -> N/A
+  EBP: 008ffd94 (   9436564) -> N/A
+  ESP: 008ffd4c (   9436492) -> 2z%x%p%hn%n%hhn%x%p%hn%n%hh%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%hn%n%hhn%x%p%hn%n%hhn%xn%n%hhn%x%p%hn%n%hhn%xhn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%phn%n%hhn%x%p%hn%n%hhnx%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%nn% (stack)
+  +00: 009432c0 (   9712320) -> 23C:/Users/dnsdu/source/repos/sa,ple/Release/sample.exe%x%p%hn%n%hhn%x%p%hn%n%hh%x%p%hn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%hn%n%hhn%x%p%hn%n%hhn%xn%n%hhn%x%p%hn%n%hhn%xhn%n%hhn%x%p%hn%n%hhn%x%p%hn%n%hhn%x%phn%n%hhn%x%p%hn%n%hhnx%p%hn% (heap)
+  +04: 007aa000 (   8036352) -> +]w (@[wpuR0]wP(m @Hw3waJ? (heap)
+  +08: 70257825 (1881503781) -> N/A
+  +0c: 256e6825 ( 627992613) -> N/A
+  +10: 6868256e (1751655790) -> N/A
+  +14: 2578256e ( 628630894) -> N/A
+
+disasm around:
+	0x002b108c add esp,0x10
+	0x002b108f mov eax,[eax+0x4]
+	0x002b1092 sub edx,eax
+	0x002b1094 mov cl,[eax]
+	0x002b1096 lea eax,[eax+0x1]
+	0x002b1099 mov [edx+eax-0x1],cl
+	0x002b109d test cl,cl
+	0x002b109f jnz 0x2b1094
+	0x002b10a1 lea eax,[ebp-0x40]
+	0x002b10a4 push eax
+	0x002b10a5 call 0x2b1010
+
+SEH unwind:
+	6e680c0c -> 68256e25: Unable to disassemble at 68256e25
+	ffffffff -> ffffffff: Unable to disassemble at ffffffff
+

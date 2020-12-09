@@ -65,7 +65,7 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 		'''
 		while 1:
 			if not self.running:
-				self.clearFile()											   # caller tmp file (clear)
+				self.initFile()											   # caller tmp file (clear)
 
 				self.programCount += 1
 				try:
@@ -111,7 +111,7 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 				time.sleep(1)
 	
 	# clear file -> _INIT_
-	def clearFile(self):
+	def initFile(self):
 		'''
 		clear tmp file		
 		'''
@@ -257,6 +257,9 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 		self.crashData = self.crashBin.crash_synopsis()
 
 		# crashData to pull -> Thread
+		with open('hashDB.txt', 'w') as f:
+			f.write('hash')
+
 		with open('crashAllInfo.txt', 'w') as f:
 			f.write(self.crashData)
 
@@ -288,7 +291,7 @@ class file_fuzzer(QDialog, main_.Ui_Dialog):
 		# Other crashes are saved in the crash file.
 		if not bool(re.search(hashdump, hashDBData)):
 			try:
-				hashFd = open('hashDB.txt', 'a')
+				hashFd = open('hashDB.txt', 'wa')
 				hashFd.write("EIP = %s & hash = %s & programPath = %s & ext = %s \n" %
 				              (eip, hashdump, self.programPath, self.ext))
 				hashFd.close()
